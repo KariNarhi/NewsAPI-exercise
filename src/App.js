@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Posts from "./components/Posts";
 import Pagination from "./components/Pagination";
 import axios from "axios";
-import { Key } from "./API_Key";
+import { Key } from "./API_Key"; // Import API key from outside the code.
 import "./App.css";
 
 const App = () => {
@@ -19,7 +19,7 @@ const App = () => {
       const res = await axios.get(
         `http://newsapi.org/v2/sources?apiKey=${Key}`
       );
-      setPosts(res.data.sources);
+      setPosts(res.data.sources); // Add news sources to "posts" state
       setLoading(false);
     };
 
