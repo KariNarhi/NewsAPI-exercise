@@ -34,24 +34,26 @@ const App = () => {
   const paginate = pageNumber => setCurrentPage(pageNumber);
 
   return (
-    <div className="container mt-5">
-      <h1 className="text-primary mb-3">News from News API</h1>
-      <Posts posts={currentPosts} loading={loading} />
-      <Pagination
-        postsPerPage={postsPerPage}
-        totalPosts={posts.length}
-        paginate={paginate}
-      />
-      <h3>
-        <a
-          href="https://newsapi.org/"
-          class="badge badge-info"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by News API
-        </a>
-      </h3>
+    <div className="container-fluid bg-dark mb-0">
+      <div className="container pt-3 pb-5">
+        <h1 className="text-primary mb-3">News from News API</h1>
+        <Posts posts={currentPosts} loading={loading} />
+        <Pagination
+          postsPerPage={postsPerPage}
+          totalPosts={posts.length}
+          paginate={paginate}
+        />
+        <h3 className="mb-0">
+          <a
+            href="https://newsapi.org/"
+            class="badge badge-info"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Powered by News API
+          </a>
+        </h3>
+      </div>
     </div>
   );
 };
