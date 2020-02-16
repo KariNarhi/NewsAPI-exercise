@@ -12,12 +12,15 @@ const App = () => {
   const [postsPerPage] = useState(10);
 
   useEffect(() => {
-    // Get posts from jsonplaceholder Fake Online REST API
+    // Get news from News API
     const fetchPosts = async () => {
       setLoading(true);
-      const res = await axios.get("https://jsonplaceholder.typicode.com/posts");
-      setPosts(res.data);
+      const res = await axios.get(
+        "http://newsapi.org/v2/sources?apiKey=e2f71203dd10408c831fb571e6164556"
+      );
+      setPosts(res.data.sources);
       setLoading(false);
+      console.log(res.data.sources);
     };
 
     fetchPosts();
@@ -32,7 +35,7 @@ const App = () => {
 
   return (
     <div className="container mt-5">
-      <h1 className="text-primary mb-3">My App</h1>
+      <h1 className="text-primary mb-3">News from News API</h1>
       <Posts posts={currentPosts} loading={loading} />
       <Pagination
         postsPerPage={postsPerPage}
