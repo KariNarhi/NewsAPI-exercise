@@ -12,6 +12,9 @@ const Posts = ({ posts, loading }) => {
         <li key={post.id} className="list-group-item itemhover">
           <h4>{post.name}</h4>
           <p>{post.description}</p>
+          <a className="btn btn-success mr-5" href="#" role="button">
+            Top headlines
+          </a>
           <a href={post.url} target="_blank" rel="noopener noreferrer">
             {post.url}
           </a>

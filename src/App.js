@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import Posts from "./components/Posts";
 import Pagination from "./components/Pagination";
 import axios from "axios";
+import Headlines from "./components/Headlines";
 import { Key } from "./API_Key"; // Import API key from outside the code.
 import "./App.css";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
 const App = () => {
   // Initialize states
@@ -34,27 +36,39 @@ const App = () => {
   const paginate = pageNumber => setCurrentPage(pageNumber);
 
   return (
-    <div className="container-fluid bg-dark mb-0">
-      <div className="container pt-3 pb-5">
-        <h1 className="text-primary mb-3">News from News API</h1>
-        <Posts posts={currentPosts} loading={loading} />
-        <Pagination
-          postsPerPage={postsPerPage}
-          totalPosts={posts.length}
-          paginate={paginate}
-        />
-        <h3 className="mb-0">
-          <a
-            href="https://newsapi.org/"
-            className="badge badge-info"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Powered by News API
-          </a>
-        </h3>
+    <Router>
+      <div className="container-fluid bg-dark mb-0">
+        <div className="container pt-3 pb-5">
+          <h1 className="text-primary mb-3">News from News API</h1>
+          <Route
+            exact
+            path="/"
+            render={props => (
+              <React.Fragment>
+                <Posts posts={currentPosts} loading={loading} />
+                <Pagination
+                  postsPerPage={postsPerPage}
+                  totalPosts={posts.length}
+                  paginate={paginate}
+                />
+              </React.Fragment>
+            )}
+          />
+          <Route path="/headlines" component={Headlines} />
+
+          <h3 className="mb-0">
+            <a
+              href="https://newsapi.org/"
+              className="badge badge-info"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Powered by News API
+            </a>
+          </h3>
+        </div>
       </div>
-    </div>
+    </Router>
   );
 };
 
