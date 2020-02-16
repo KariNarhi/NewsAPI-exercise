@@ -10,7 +10,11 @@ const Posts = ({ posts, loading }) => {
     <ul className="list-group mb-4">
       {posts.map(post => (
         <li key={post.id} className="list-group-item">
-          {post.name}
+          <h4>{post.name}</h4>
+          <p>{post.description}</p>
+          <a href={post.url} target="_blank" rel="noopener noreferrer">
+            {post.url}
+          </a>
         </li>
       ))}
     </ul>
