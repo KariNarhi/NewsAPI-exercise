@@ -42,6 +42,16 @@ const App = () => {
         totalPosts={posts.length}
         paginate={paginate}
       />
+      <h3>
+        <a
+          href="https://newsapi.org/"
+          class="badge badge-info"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Powered by News API
+        </a>
+      </h3>
     </div>
   );
 };
