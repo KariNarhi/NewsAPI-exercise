@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Posts from "./components/Posts";
 import Pagination from "./components/Pagination";
-import axios from "axios";
 import Headlines from "./components/Headlines";
+import axios from "axios";
 import { Key } from "./API_Key"; // Import API key from outside the code.
 import "./App.css";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
 
 const App = () => {
   // Initialize states
@@ -15,8 +15,8 @@ const App = () => {
   const [postsPerPage] = useState(10);
 
   useEffect(() => {
-    // Get news from News API
-    const fetchPosts = async () => {
+    // Get news sources from News API
+    const fetchSources = async () => {
       setLoading(true);
       const res = await axios.get(
         `http://newsapi.org/v2/sources?apiKey=${Key}`
@@ -25,7 +25,7 @@ const App = () => {
       setLoading(false);
     };
 
-    fetchPosts();
+    fetchSources();
   }, []);
 
   const indexOfLastPost = currentPage * postsPerPage; // Get last post index
@@ -39,22 +39,29 @@ const App = () => {
     <Router>
       <div className="container-fluid bg-dark mb-0">
         <div className="container pt-3 pb-5">
+          <h3>
+            <Link to="/" className="badge badge-info">
+              Back to sources
+            </Link>
+          </h3>
           <h1 className="text-primary mb-3">News from News API</h1>
-          <Route
-            exact
-            path="/"
-            render={props => (
-              <React.Fragment>
-                <Posts posts={currentPosts} loading={loading} />
-                <Pagination
-                  postsPerPage={postsPerPage}
-                  totalPosts={posts.length}
-                  paginate={paginate}
-                />
-              </React.Fragment>
-            )}
-          />
-          <Route path="/headlines" component={Headlines} />
+          <Switch>
+            <Route
+              exact
+              path="/"
+              render={props => (
+                <React.Fragment>
+                  <Posts posts={currentPosts} loading={loading} />
+                  <Pagination
+                    postsPerPage={postsPerPage}
+                    totalPosts={posts.length}
+                    paginate={paginate}
+                  />
+                </React.Fragment>
+              )}
+            />
+            <Route path="/headlines" component={Headlines} />
+          </Switch>
 
           <h3 className="mb-0">
             <a
