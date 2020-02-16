@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Posts from "./components/Posts";
 import Pagination from "./components/Pagination";
 import axios from "axios";
+import { Key } from "./API_Key";
 import "./App.css";
 
 const App = () => {
@@ -16,11 +17,10 @@ const App = () => {
     const fetchPosts = async () => {
       setLoading(true);
       const res = await axios.get(
-        "http://newsapi.org/v2/sources?apiKey=e2f71203dd10408c831fb571e6164556"
+        `http://newsapi.org/v2/sources?apiKey=${Key}`
       );
       setPosts(res.data.sources);
       setLoading(false);
-      console.log(res.data.sources);
     };
 
     fetchPosts();
@@ -46,7 +46,7 @@ const App = () => {
         <h3 className="mb-0">
           <a
             href="https://newsapi.org/"
-            class="badge badge-info"
+            className="badge badge-info"
             target="_blank"
             rel="noopener noreferrer"
           >
