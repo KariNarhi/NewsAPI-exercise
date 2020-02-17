@@ -23,6 +23,7 @@ const App = () => {
       );
       setSources(res.data.sources); // Add news sources to "sources" state
       setLoading(false);
+      console.log(res.data.sources.map(source => source.id));
     };
 
     fetchNews();
@@ -64,7 +65,7 @@ const App = () => {
               path="/headlines"
               render={props => (
                 <React.Fragment>
-                  <Headlines headlines={currentSources} loading={loading} />
+                  <Headlines sources={currentSources} loading={loading} />
                   <Pagination
                     sourcesPerPage={sourcesPerPage}
                     totalSources={sources.length}

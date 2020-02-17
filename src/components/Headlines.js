@@ -6,6 +6,7 @@ const Headlines = ({ headlines, loading }) => {
   }
 
   /* Map through the headlines received as props, and return them as a list */
+
   return (
     <ul className="list-group mb-4">
       {headlines.map(headline => (
