@@ -65,7 +65,7 @@ const App = () => {
               path="/headlines"
               render={props => (
                 <React.Fragment>
-                  <Headlines sources={currentSources} loading={loading} />
+                  <Headlines headlines={currentSources} loading={loading} />
                   <Pagination
                     sourcesPerPage={sourcesPerPage}
                     totalSources={sources.length}

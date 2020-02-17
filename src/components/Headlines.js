@@ -1,12 +1,14 @@
 import React from "react";
+// import { useParams } from "react-router-dom";
 
 const Headlines = ({ headlines, loading }) => {
   if (loading) {
     return <h2>Loading...</h2>; // Show text "Loading..." if loading not done.
   }
 
-  /* Map through the headlines received as props, and return them as a list */
+  // const { source } = useParams();
 
+  /* Map through the headlines received as props, and return them as a list */
   return (
     <ul className="list-group mb-4">
       {headlines.map(headline => (

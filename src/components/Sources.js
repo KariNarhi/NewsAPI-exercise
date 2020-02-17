@@ -13,7 +13,10 @@ const Sources = ({ sources, loading }) => {
         <li key={source.id} className="list-group-item itemhover">
           <h4>{source.name}</h4>
           <p>{source.description}</p>
-          <Link to="/headlines" className="btn btn-success mr-5">
+          <Link
+            to={{ pathname: "/headlines", source: { sourceID: source.id } }}
+            className="btn btn-success mr-5"
+          >
             Top headlines
           </Link>
           <a href={source.url} target="_blank" rel="noopener noreferrer">
