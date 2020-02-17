@@ -1,10 +1,10 @@
 import React from "react";
 
-const Pagination = ({ postsPerPage, totalPosts, paginate }) => {
+const Pagination = ({ sourcesPerPage, totalSources, paginate }) => {
   const pageNumbers = []; // Empty array for pagenumbers.
 
-  // Create pagenumbers from total posts divided by posts per page.
-  for (let i = 1; i <= Math.ceil(totalPosts / postsPerPage); i++) {
+  // Create pagenumbers from total sources divided by sources per page.
+  for (let i = 1; i <= Math.ceil(totalSources / sourcesPerPage); i++) {
     pageNumbers.push(i); // Push pagenumbers to their own array.
   }
 

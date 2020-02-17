@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Posts from "./components/Posts";
+import Sources from "./components/Sources";
 import Pagination from "./components/Pagination";
 import Headlines from "./components/Headlines";
 import axios from "axios";
@@ -12,7 +12,7 @@ const App = () => {
   const [sources, setSources] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage] = useState(10);
+  const [sourcesPerPage] = useState(10);
 
   useEffect(() => {
     // Get news sources from News API
@@ -21,16 +21,16 @@ const App = () => {
       const res = await axios.get(
         `http://newsapi.org/v2/sources?apiKey=${Key}`
       );
-      setSources(res.data.sources); // Add news sources to "posts" state
+      setSources(res.data.sources); // Add news sources to "sources" state
       setLoading(false);
     };
 
     fetchNews();
   }, []);
 
-  const indexOfLastPost = currentPage * postsPerPage; // Get last post index
-  const indexOfFirstPost = indexOfLastPost - postsPerPage; // Get first post index
-  const currentPosts = sources.slice(indexOfFirstPost, indexOfLastPost); // Get current posts
+  const indexOfLastSource = currentPage * sourcesPerPage; // Get last source index
+  const indexOfFirstSource = indexOfLastSource - sourcesPerPage; // Get first source index
+  const currentSources = sources.slice(indexOfFirstSource, indexOfLastSource); // Get current sources
 
   // Change page
   const paginate = pageNumber => setCurrentPage(pageNumber);
@@ -51,10 +51,10 @@ const App = () => {
               path="/"
               render={props => (
                 <React.Fragment>
-                  <Posts posts={currentPosts} loading={loading} />
+                  <Sources sources={currentSources} loading={loading} />
                   <Pagination
-                    postsPerPage={postsPerPage}
-                    totalPosts={sources.length}
+                    sourcesPerPage={sourcesPerPage}
+                    totalSources={sources.length}
                     paginate={paginate}
                   />
                 </React.Fragment>
@@ -64,10 +64,10 @@ const App = () => {
               path="/headlines"
               render={props => (
                 <React.Fragment>
-                  <Headlines sources={sources} loading={loading} />
+                  <Headlines headlines={currentSources} loading={loading} />
                   <Pagination
-                    postsPerPage={postsPerPage}
-                    totalPosts={sources.length}
+                    sourcesPerPage={sourcesPerPage}
+                    totalSources={sources.length}
                     paginate={paginate}
                   />
                 </React.Fragment>
