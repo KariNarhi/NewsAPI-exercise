@@ -9,28 +9,28 @@ import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
 
 const App = () => {
   // Initialize states
-  const [posts, setPosts] = useState([]);
+  const [sources, setSources] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(10);
 
   useEffect(() => {
     // Get news sources from News API
-    const fetchSources = async () => {
+    const fetchNews = async () => {
       setLoading(true);
       const res = await axios.get(
         `http://newsapi.org/v2/sources?apiKey=${Key}`
       );
-      setPosts(res.data.sources); // Add news sources to "posts" state
+      setSources(res.data.sources); // Add news sources to "posts" state
       setLoading(false);
     };
 
-    fetchSources();
+    fetchNews();
   }, []);
 
   const indexOfLastPost = currentPage * postsPerPage; // Get last post index
   const indexOfFirstPost = indexOfLastPost - postsPerPage; // Get first post index
-  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost); // Get current posts
+  const currentPosts = sources.slice(indexOfFirstPost, indexOfLastPost); // Get current posts
 
   // Change page
   const paginate = pageNumber => setCurrentPage(pageNumber);
@@ -54,13 +54,25 @@ const App = () => {
                   <Posts posts={currentPosts} loading={loading} />
                   <Pagination
                     postsPerPage={postsPerPage}
-                    totalPosts={posts.length}
+                    totalPosts={sources.length}
                     paginate={paginate}
                   />
                 </React.Fragment>
               )}
             />
-            <Route path="/headlines" component={Headlines} />
+            <Route
+              path="/headlines"
+              render={props => (
+                <React.Fragment>
+                  <Headlines sources={sources} loading={loading} />
+                  <Pagination
+                    postsPerPage={postsPerPage}
+                    totalPosts={sources.length}
+                    paginate={paginate}
+                  />
+                </React.Fragment>
+              )}
+            />
           </Switch>
 
           <h3 className="mb-0">

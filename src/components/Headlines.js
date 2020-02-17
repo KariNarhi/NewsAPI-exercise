@@ -1,6 +1,6 @@
 import React from "react";
 
-const Headlines = ({ posts, loading }) => {
+const Headlines = ({ sources, loading }) => {
   if (loading) {
     return <h2>Loading...</h2>; // Show text "Loading..." if loading not done.
   }
@@ -8,7 +8,7 @@ const Headlines = ({ posts, loading }) => {
   /* Map through the posts received as props, and return them as a list */
   return (
     <ul className="list-group mb-4">
-      {posts.map(post => (
+      {sources.map(post => (
         <li key={post.id} className="list-group-item itemhover">
           <h4>{post.title}</h4>
           <p>{post.description}</p>
