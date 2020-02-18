@@ -27,22 +27,35 @@ const Headlines = ({ loading }) => {
     fetchArticles();
   }
 
+  const formatTime = publishedAt => {
+    const publishDate = publishedAt.slice(0, 10);
+    return publishDate;
+  };
+
   /* Map through the headlines received as props, and return them as a list */
   return (
     <ul className="list-group mb-4">
       {articles.map(article => (
         <li key={article.title} className="list-group-item itemhover">
-          <h4>{article.title}</h4>
+          <h4>
+            <b>{article.title}</b>
+          </h4>
           <p>
             <i>{article.author}</i>
           </p>
-          <blockquote>{article.description}</blockquote>
-          <a href={article.url} target="_blank" rel="noopener noreferrer">
-            {article.url}
-          </a>
+          <blockquote className="blockquote">{article.description}</blockquote>
+          <h3>
+            <a
+              href={article.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="badge badge-primary"
+            >
+              Read More
+            </a>
+          </h3>
           <br />
-          <br />
-          <b>{article.publishedAt}</b>
+          <b>{formatTime(article.publishedAt)}</b>
         </li>
       ))}
     </ul>
