@@ -23,7 +23,6 @@ const App = () => {
       );
       setSources(res.data.sources); // Add news sources to "sources" state
       setLoading(false);
-      console.log(res.data.sources.map(source => source.id));
     };
 
     fetchNews();
@@ -40,11 +39,6 @@ const App = () => {
     <Router>
       <div className="container-fluid bg-dark mb-0">
         <div className="container pt-3 pb-5">
-          <h3>
-            <Link to="/" className="badge badge-info">
-              Back to sources
-            </Link>
-          </h3>
           <h1 className="text-primary mb-3">News from News API</h1>
           <Switch>
             <Route
@@ -65,12 +59,12 @@ const App = () => {
               path="/headlines"
               render={props => (
                 <React.Fragment>
-                  <Headlines headlines={currentSources} loading={loading} />
-                  <Pagination
-                    sourcesPerPage={sourcesPerPage}
-                    totalSources={sources.length}
-                    paginate={paginate}
-                  />
+                  <h3>
+                    <Link to="/" className="badge badge-info">
+                      Back to sources
+                    </Link>
+                  </h3>
+                  <Headlines loading={loading} />
                 </React.Fragment>
               )}
             />

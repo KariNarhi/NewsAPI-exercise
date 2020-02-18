@@ -14,7 +14,10 @@ const Sources = ({ sources, loading }) => {
           <h4>{source.name}</h4>
           <p>{source.description}</p>
           <Link
-            to={{ pathname: "/headlines", source: { sourceID: source.id } }}
+            to={{
+              pathname: `/headlines/?source=${source.id}`,
+              source: { sourceID: source.id }
+            }}
             className="btn btn-success mr-5"
           >
             Top headlines
