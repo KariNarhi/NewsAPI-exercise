@@ -19,7 +19,7 @@ const App = () => {
     const fetchNews = async () => {
       setLoading(true);
       const res = await axios.get(
-        `http://newsapi.org/v2/sources?apiKey=${Key}`
+        `https://newsapi.org/v2/sources?apiKey=${Key}`
       );
       setSources(res.data.sources); // Add news sources to "sources" state
       setLoading(false);

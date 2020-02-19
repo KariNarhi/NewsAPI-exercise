@@ -17,7 +17,7 @@ const Headlines = ({ loading }) => {
 
   const fetchArticles = async () => {
     const res = await axios.get(
-      `http://newsapi.org/v2/top-headlines?sources=${source}&apiKey=${Key}`
+      `https://newsapi.org/v2/top-headlines?sources=${source}&apiKey=${Key}`
     );
     setArticles(res.data.articles); // Add news to "articles" state
     // console.log(res.data.articles);
