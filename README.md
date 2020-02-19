@@ -1,4 +1,4 @@
-# Simple Pagination App made with React
+# Simple News API App made with React
 
 [Powered by News API](https://newsapi.org/).
 
