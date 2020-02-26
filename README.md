@@ -2,6 +2,8 @@
 
 [Powered by News API](https://newsapi.org/).
 
+#### Note: the API key found in commit history was an accidental commit and has now been regenerated, and thus making the old key invalid.
+
 ---
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
