@@ -19,7 +19,7 @@ const App = () => {
     const fetchNews = async () => {
       setLoading(true);
       const res = await axios.get(
-        `https://newsapi.org/v2/sources?apiKey=${Key}`
+        `https://cors-anywhere.herokuapp.com/https://newsapi.org/v2/sources?apiKey=${Key}`
       );
       setSources(res.data.sources); // Add news sources to "sources" state
       setLoading(false);
@@ -33,7 +33,7 @@ const App = () => {
   const currentSources = sources.slice(indexOfFirstSource, indexOfLastSource); // Get current sources
 
   // Change page
-  const paginate = pageNumber => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <Router>
@@ -44,7 +44,7 @@ const App = () => {
             <Route
               exact
               path="/"
-              render={props => (
+              render={(props) => (
                 <React.Fragment>
                   <Sources sources={currentSources} loading={loading} />
                   <Pagination
@@ -57,7 +57,7 @@ const App = () => {
             />
             <Route
               path="/headlines"
-              render={props => (
+              render={(props) => (
                 <React.Fragment>
                   <h3>
                     <Link to="/" className="badge badge-info">

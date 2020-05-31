@@ -17,7 +17,7 @@ const Headlines = ({ loading }) => {
 
   const fetchArticles = async () => {
     const res = await axios.get(
-      `https://newsapi.org/v2/top-headlines?sources=${source}&apiKey=${Key}`
+      `https://cors-anywhere.herokuapp.com/https://newsapi.org/v2/top-headlines?sources=${source}&apiKey=${Key}`
     );
     setArticles(res.data.articles); // Add news to "articles" state
     // console.log(res.data.articles);
@@ -27,7 +27,7 @@ const Headlines = ({ loading }) => {
     fetchArticles();
   }
 
-  const formatTime = publishedAt => {
+  const formatTime = (publishedAt) => {
     const publishDate = publishedAt.slice(0, 10);
     return publishDate;
   };
@@ -35,7 +35,7 @@ const Headlines = ({ loading }) => {
   /* Map through the headlines received as props, and return them as a list */
   return (
     <ul className="list-group mb-4">
-      {articles.map(article => (
+      {articles.map((article) => (
         <li key={article.title} className="list-group-item itemhover">
           <h4>
             <b>{article.title}</b>
