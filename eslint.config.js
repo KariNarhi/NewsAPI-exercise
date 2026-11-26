@@ -5,7 +5,14 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 
 export default defineConfig([
-  globalIgnores(["build", ".vitest", "src/API_Key.js"]),
+  globalIgnores([
+    "build",
+    ".vitest",
+    "test-results",
+    "playwright-report",
+    "blob-report",
+    "src/API_Key.js",
+  ]),
   {
     files: ["**/*.{js,jsx}"],
     extends: [
@@ -21,5 +28,9 @@ export default defineConfig([
   {
     files: ["vite.config.js", "vite.config.test.js"],
     languageOptions: { globals: globals.node },
+  },
+  {
+    files: ["playwright.config.js", "e2e/**/*.js"],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 ]);

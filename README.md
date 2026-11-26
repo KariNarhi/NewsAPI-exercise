@@ -23,11 +23,15 @@ Restart the server after changing the key.
 - `npm start` / `npm run dev`: development server
 - `npm test`: Vitest in watch mode
 - `npm run test:ui`: Vitest UI; open the tokenised URL printed in the terminal
+- `npm run test:e2e`: Playwright end-to-end tests
+- `npm run test:e2e:ui`: Playwright UI mode
 - `npm run lint`: ESLint
 - `npm run build`: production build into `build/`
 - `npm run preview`: serve the build locally
 
 Test runs also write an HTML report to `.vitest/` (gitignored). View it with `npx vite preview --outDir .vitest`.
+
+The end-to-end tests run in Chromium, Firefox and WebKit, including phone emulation, with a mocked API. Install the browsers once with `npx playwright install`. View the last report with `npx playwright show-report`.
 
 ## API key and proxy
 

@@ -22,6 +22,11 @@ npm run preview                          # serve the build, with the proxy
 npm test                                 # Vitest watch mode
 npm run test:ui                          # Vitest UI (port 51204)
 npx vite preview --outDir .vitest        # view the HTML test report
+npm run test:e2e                         # Playwright, five browser projects
+npm run test:e2e -- --project=chromium e2e/pagination.spec.js
+npm run test:e2e -- -g "scrolls to the top"
+npm run test:e2e:ui                      # Playwright UI mode
+npx playwright show-report               # last Playwright HTML report
 npm test -- --run                        # one run
 npm test -- --run src/App.test.jsx       # single file
 npm test -- --run -t "twelve sources"    # single test by name
@@ -37,4 +42,5 @@ npm test -- --run -t "twelve sources"    # single test by name
 - Tests sit next to the code they cover: component tests, `App` integration tests and `vite.config.test.js`. They mock axios; shared data is in `src/testFixtures.js`. `mockReset` is on, so set mock behaviour inside each test or `beforeEach`. Any test of the Vite config must mock `loadEnv`, so the real key is never read.
 - Test runs use the `default` and `html` reporters; the report goes to `.vitest/`.
 - `Pagination.jsx` keeps one row at every width: it measures itself with `ResizeObserver` and shows as many page numbers as fit between the first, previous, next and last buttons. Its `BUTTON_WIDTH` and `GAP` must match `.app-pagination` in `App.css`.
+- Playwright tests are in `e2e/` (excluded from Vitest). Import `test` from `e2e/fixtures.js`, which mocks the API and external sites. Its server runs `vite --mode test` on port 3100, so the proxy is off; keep it that way and keep `reuseExistingServer: false`.
 - Styling is Bootstrap 5 (npm, CSS only, no Bootstrap JS), then `src/gta-vi-theme.css`, then `src/App.css`, imported in that order by `src/index.jsx`. The theme file is portable: leave it as is and put app styles in `App.css`, using the theme's color variables. It needs `class="app-body"` on `<body>` and the Google Fonts linked in `index.html`.

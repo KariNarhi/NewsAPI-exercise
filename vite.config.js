@@ -25,6 +25,7 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       environment: "jsdom",
+      exclude: ["**/node_modules/**", "**/.git/**", "e2e/**"], // Playwright
       mockReset: true,
       reporters: ["default", "html"],
       setupFiles: "./src/setupTests.js",

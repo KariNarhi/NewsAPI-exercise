@@ -151,8 +151,10 @@
 }
 
 .app-footer a {
-  display: inline-block;
-  padding: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 0.6rem;
 }
 
 a:focus-visible,
