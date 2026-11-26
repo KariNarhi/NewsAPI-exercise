@@ -1,3 +1,183 @@
-.itemhover:hover {
-  background-color: lightcyan;
+/* App-specific styles on top of Bootstrap and gta-vi-theme.css */
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+}
+
+.app-nav .navbar-brand {
+  margin: 0;
+  white-space: normal;
+}
+
+.app-title {
+  margin-bottom: 1.25rem;
+}
+
+/* Cards */
+.app-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.25rem;
+  overflow-wrap: anywhere;
+  background: rgba(59, 20, 107, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 1rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(26, 6, 52, 0.28);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.app-card:hover,
+.app-card:focus-within {
+  border-color: var(--warm-yellow);
+  transform: translateY(-3px);
+}
+
+.app-card-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.app-card p {
+  font-size: 0.925rem;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.app-card .app-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  font-size: 0.8rem;
+  color: var(--warm-yellow);
+}
+
+.app-card-url {
+  display: block;
+  overflow: hidden;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  line-height: 44px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-card-url,
+.app-footer a {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.app-card-url:hover,
+.app-footer a:hover {
+  color: var(--warm-yellow);
+}
+
+/* Buttons: size for touch, keep the theme colours while pressed */
+.btn-suggest,
+.btn-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: 1.25rem;
+  --bs-btn-active-color: var(--deep-violet);
+  --bs-btn-active-bg: var(--warm-yellow);
+}
+
+/* Pagination */
+.app-pagination {
+  flex-wrap: nowrap;
+  gap: 6px; /* Pagination.jsx uses this gap and button width */
+}
+
+.app-pagination .page-link {
+  width: 44px;
+  min-height: 44px;
+  padding-inline: 0;
+  text-align: center;
+  color: #fff;
+  background: rgba(59, 20, 107, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+}
+
+.app-pagination .page-link:hover {
+  border-color: var(--warm-yellow);
+  color: var(--warm-yellow);
+}
+
+.app-pagination .active > .page-link {
+  font-weight: 600;
+  color: var(--deep-violet);
+  background: linear-gradient(90deg, var(--orange), var(--warm-yellow));
+  border-color: var(--warm-yellow);
+}
+
+.app-pagination .disabled > .page-link {
+  color: rgba(255, 255, 255, 0.45);
+  background: rgba(59, 20, 107, 0.4);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Status messages */
+.app-loading {
+  padding: 3rem 0;
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+.app-alert {
+  color: #fff;
+  overflow-wrap: anywhere;
+  background: rgba(59, 20, 107, 0.9);
+  border: 2px solid var(--coral);
+  border-radius: 0.75rem;
+}
+
+.app-footer {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  text-align: center;
+  background: var(--deep-violet);
+}
+
+.app-footer a {
+  display: inline-block;
+  padding: 0.6rem;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--warm-yellow);
+  outline-offset: 2px;
+}
+
+@media (max-width: 575.98px) {
+  .app-title {
+    font-size: 2.5rem;
+  }
+
+  .app-nav .navbar-brand {
+    font-size: 1.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-card {
+    transition: none;
+  }
+
+  .app-card:hover,
+  .app-card:focus-within {
+    transform: none;
+  }
 }

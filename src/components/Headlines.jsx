@@ -4,7 +4,7 @@ import axios from "axios";
 import getErrorMessage from "../getErrorMessage";
 
 const Headlines = ({ loading }) => {
-  const [articles, setArticles] = useState([]);
+  const [result, setResult] = useState({ source: null, articles: [] });
   const [error, setError] = useState(null); // { source, message }
   const [searchParams] = useSearchParams();
 
@@ -20,7 +20,7 @@ const Headlines = ({ loading }) => {
           params: { sources: source },
         });
         if (!ignore) {
-          setArticles(res.data.articles); // Add news to "articles" state
+          setResult({ source, articles: res.data.articles });
           setError(null);
         }
       } catch (err) {
@@ -36,7 +36,7 @@ const Headlines = ({ loading }) => {
   }, [source]);
 
   if (loading) {
-    return <h2>Loading...</h2>; // Show text "Loading..." if loading not done.
+    return <h2 className="app-loading">Loading...</h2>; // Show text "Loading..." if loading not done.
   }
 
   const formatTime = (publishedAt) => {
@@ -46,36 +46,42 @@ const Headlines = ({ loading }) => {
 
   if (error?.source === source) {
     return (
-      <div className="alert alert-danger" role="alert">
+      <div className="alert app-alert" role="alert">
         Could not load headlines: {error.message}
       </div>
     );
   }
 
-  /* Map through the headlines received as props, and return them as a list */
+  // Never show the previous source's articles while the next ones load
+  const articles = result.source === source ? result.articles : [];
+
+  /* Map through the headlines received as props, and return them as a card grid */
   return (
-    <ul className="list-group mb-4">
+    <ul className="row row-cols-1 row-cols-md-2 g-3 list-unstyled mb-4">
       {articles.map((article) => (
-        <li key={article.title} className="list-group-item itemhover">
-          <h4>
-            <b>{article.title}</b>
-          </h4>
-          <p>
-            <i>{article.author}</i>
-          </p>
-          <blockquote className="blockquote">{article.description}</blockquote>
-          <h3>
-            <a
-              href={article.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="badge badge-primary"
-            >
-              Read More
-            </a>
-          </h3>
-          <br />
-          <b>{formatTime(article.publishedAt)}</b>
+        <li key={article.url} className="col">
+          <article className="app-card">
+            <h2 className="app-card-title" dir="auto">
+              {article.title}
+            </h2>
+            <p className="app-card-meta">
+              {article.author && <span dir="auto">{article.author}</span>}
+              <time dateTime={article.publishedAt}>
+                {formatTime(article.publishedAt)}
+              </time>
+            </p>
+            <p dir="auto">{article.description}</p>
+            <div className="mt-auto">
+              <a
+                href={article.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-suggest"
+              >
+                Read More
+              </a>
+            </div>
+          </article>
         </li>
       ))}
     </ul>

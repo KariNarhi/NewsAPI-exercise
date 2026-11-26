@@ -3,64 +3,79 @@ import userEvent from "@testing-library/user-event";
 import axios from "axios";
 import { beforeEach, expect, test, vi } from "vitest";
 import App from "./App";
+import { makeArticle, makeSources } from "./testFixtures";
 
 vi.mock("axios");
 
-const sources = Array.from({ length: 11 }, (_, i) => ({
-  id: `source-${i + 1}`,
-  name: `Source ${i + 1}`,
-  description: "A source",
-  url: `https://example.com/${i + 1}`,
-}));
+const mockApi = () =>
+  axios.get.mockImplementation(async (url) => ({
+    data: url.endsWith("/sources")
+      ? { sources: makeSources(13) }
+      : { articles: [makeArticle()] },
+  }));
 
-const article = {
-  title: "A headline",
-  url: "https://example.com/article",
-  publishedAt: "2026-01-02T03:04:05Z",
-};
+const sourceRequests = () =>
+  axios.get.mock.calls.filter(([url]) => url === "/api/news/sources");
+
+const click = (name) => userEvent.click(screen.getByRole("link", { name }));
+
+const goToPage = (name) =>
+  userEvent.click(screen.getByRole("button", { name }));
+
+const pageButton = (name) => screen.getByRole("button", { name });
 
 beforeEach(() => {
   window.history.pushState({}, "", "/");
-  axios.get.mockImplementation(async (url) => ({
-    data: url.endsWith("/sources") ? { sources } : { articles: [article] },
-  }));
+  // jsdom does not implement scrolling
+  vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+  mockApi();
 });
 
-test("paginates the sources", async () => {
+test("shows loading, then twelve sources per page", async () => {
   render(<App />);
+  expect(screen.getByText("Loading...")).toBeInTheDocument();
+
   expect(await screen.findByText("Source 1")).toBeInTheDocument();
-  expect(screen.queryByText("Source 11")).not.toBeInTheDocument();
+  expect(screen.getByText("Source 12")).toBeInTheDocument();
+  expect(screen.queryByText("Source 13")).not.toBeInTheDocument();
 
-  await userEvent.click(screen.getByRole("link", { name: "2" }));
-  expect(screen.getByText("Source 11")).toBeInTheDocument();
+  await goToPage("2");
+  expect(screen.getByText("Source 13")).toBeInTheDocument();
+  expect(screen.queryByText("Source 1")).not.toBeInTheDocument();
+  expect(pageButton("2")).toHaveAttribute("aria-current", "page");
+  expect(pageButton("1")).not.toHaveAttribute("aria-current");
+
+  await goToPage("1");
+  expect(screen.getByText("Source 1")).toBeInTheDocument();
+  expect(screen.queryByText("Source 13")).not.toBeInTheDocument();
 });
 
-test("shows headlines for the chosen source", async () => {
+test("opens headlines and returns to the same page of sources", async () => {
   render(<App />);
-  const links = await screen.findAllByRole("link", { name: "Top headlines" });
+  await screen.findByText("Source 1");
+  await goToPage("2");
 
-  await userEvent.click(links[1]);
+  await click("Top headlines");
   expect(await screen.findByText("A headline")).toBeInTheDocument();
-  expect(window.location.search).toBe("?source=source-2");
+  expect(window.location.search).toBe("?source=source-13");
   expect(axios.get).toHaveBeenCalledWith("/api/news/top-headlines", {
-    params: { sources: "source-2" },
+    params: { sources: "source-13" },
   });
+
+  await click("Back to sources");
+  expect(screen.getByText("Source 13")).toBeInTheDocument();
+  expect(sourceRequests()).toHaveLength(1);
 });
 
-test("requests a source with no articles only once", async () => {
-  axios.get.mockClear();
-  axios.get.mockImplementation(async (url) => ({
-    data: url.endsWith("/sources") ? { sources } : { articles: [] },
-  }));
-  window.history.pushState({}, "", "/headlines?source=empty");
+test("loads headlines when their URL is opened directly", async () => {
+  window.history.pushState({}, "", "/headlines?source=source-3");
 
   render(<App />);
-  await new Promise((resolve) => setTimeout(resolve, 50));
 
-  const headlineCalls = axios.get.mock.calls.filter(([url]) =>
-    url.endsWith("/top-headlines"),
-  );
-  expect(headlineCalls).toHaveLength(1);
+  expect(await screen.findByText("A headline")).toBeInTheDocument();
+  expect(axios.get).toHaveBeenCalledWith("/api/news/top-headlines", {
+    params: { sources: "source-3" },
+  });
 });
 
 test("shows an error when sources fail to load", async () => {
@@ -74,18 +89,38 @@ test("shows an error when sources fail to load", async () => {
     "Could not load sources: Your API key is invalid.",
   );
   expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
+  expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
 });
 
-test("shows an error when headlines fail to load", async () => {
+test("still shows headlines when only the sources request fails", async () => {
   axios.get.mockImplementation(async (url) => {
-    if (url.endsWith("/sources")) return { data: { sources } };
-    throw new Error("Network Error");
+    if (url.endsWith("/sources")) throw new Error("Network Error");
+    return { data: { articles: [makeArticle()] } };
   });
   window.history.pushState({}, "", "/headlines?source=source-1");
 
   render(<App />);
 
-  expect(await screen.findByRole("alert")).toHaveTextContent(
-    "Could not load headlines: Network Error",
-  );
+  expect(await screen.findByText("A headline")).toBeInTheDocument();
+});
+
+test("scrolls to the top only when the page is changed", async () => {
+  render(<App />);
+  await screen.findByText("Source 1");
+  expect(window.scrollTo).not.toHaveBeenCalled();
+
+  await goToPage("2");
+
+  expect(window.scrollTo).toHaveBeenCalledExactlyOnceWith(0, 0);
+});
+
+test("moves between pages with the next and previous buttons", async () => {
+  render(<App />);
+  await screen.findByText("Source 1");
+
+  await goToPage("Next page");
+  expect(screen.getByText("Source 13")).toBeInTheDocument();
+
+  await goToPage("Previous page");
+  expect(screen.getByText("Source 1")).toBeInTheDocument();
 });

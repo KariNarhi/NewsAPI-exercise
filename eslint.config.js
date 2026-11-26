@@ -5,7 +5,7 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 
 export default defineConfig([
-  globalIgnores(["build", "src/API_Key.js"]),
+  globalIgnores(["build", ".vitest", "src/API_Key.js"]),
   {
     files: ["**/*.{js,jsx}"],
     extends: [
@@ -19,7 +19,7 @@ export default defineConfig([
     },
   },
   {
-    files: ["vite.config.js"],
+    files: ["vite.config.js", "vite.config.test.js"],
     languageOptions: { globals: globals.node },
   },
 ]);

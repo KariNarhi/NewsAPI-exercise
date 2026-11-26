@@ -22,12 +22,15 @@ Restart the server after changing the key.
 
 - `npm start` / `npm run dev`: development server
 - `npm test`: Vitest in watch mode
+- `npm run test:ui`: Vitest UI; open the tokenised URL printed in the terminal
 - `npm run lint`: ESLint
 - `npm run build`: production build into `build/`
 - `npm run preview`: serve the build locally
+
+Test runs also write an HTML report to `.vitest/` (gitignored). View it with `npx vite preview --outDir .vitest`.
 
 ## API key and proxy
 
 The browser calls `/api/news/...`. The Vite server forwards the request to `https://newsapi.org/v2/...` and adds the key, so the key is not part of the browser code.
 
-The proxy exists only in `npm start` and `npm run preview`. A static host serving `build/` has to provide the same `/api/news` forwarding itself.
+The proxy exists only in `npm start` and `npm run preview`. It is off during test runs, including the Vitest UI. A static host serving `build/` has to provide the same `/api/news` forwarding itself.

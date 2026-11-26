@@ -20,17 +20,21 @@ npm run lint
 npm run build                            # output in build/
 npm run preview                          # serve the build, with the proxy
 npm test                                 # Vitest watch mode
+npm run test:ui                          # Vitest UI (port 51204)
+npx vite preview --outDir .vitest        # view the HTML test report
 npm test -- --run                        # one run
 npm test -- --run src/App.test.jsx       # single file
-npm test -- --run -t "paginates"         # single test by name
+npm test -- --run -t "twelve sources"    # single test by name
 ```
 
 ## Architecture
 
-- The browser never holds the API key. Code requests `/api/news/...`; the proxy in `vite.config.js` rewrites it to `https://newsapi.org/v2/...` and adds `X-Api-Key` from `NEWS_API_KEY`. Do not rename it with a `VITE_` prefix, which would expose it to client code. The proxy exists only under the Vite dev and preview servers.
-- `src/App.jsx` owns the router (`react-router`), fetches the source list once on mount and paginates it on the client (10 per page). `Sources` and `Pagination` are presentational.
+- The browser never holds the API key. Code requests `/api/news/...`; the proxy in `vite.config.js` rewrites it to `https://newsapi.org/v2/...` and adds `X-Api-Key` from `NEWS_API_KEY`. Do not rename it with a `VITE_` prefix, which would expose it to client code. The proxy exists only under the Vite dev and preview servers, and is off in `test` mode so the Vitest UI server cannot use the key.
+- `src/App.jsx` owns the router (`react-router`), fetches the source list once on mount and paginates it on the client (12 per page, so full pages fill the 1, 2 and 3 column grids; keep it divisible by those). `Sources` and `Pagination` are presentational.
 - `src/components/Headlines.jsx` fetches its own data for the `?source=<id>` search parameter set by `Sources.jsx`. The `loading` prop it receives from `App` tracks the *sources* request, not the headlines request.
 - `Headlines.jsx` fetches in an effect keyed on the source, so an empty result shows an empty list.
 - Both requests show failures in a Bootstrap alert, with the message taken by `src/getErrorMessage.js`.
-- Tests (`src/App.test.jsx`) mock axios and render the whole `App` in jsdom.
-- Styling is Bootstrap 4.4.1 from a CDN `<link>` in `index.html` (no npm package, no Bootstrap JS).
+- Tests sit next to the code they cover: component tests, `App` integration tests and `vite.config.test.js`. They mock axios; shared data is in `src/testFixtures.js`. `mockReset` is on, so set mock behaviour inside each test or `beforeEach`. Any test of the Vite config must mock `loadEnv`, so the real key is never read.
+- Test runs use the `default` and `html` reporters; the report goes to `.vitest/`.
+- `Pagination.jsx` keeps one row at every width: it measures itself with `ResizeObserver` and shows as many page numbers as fit between the first, previous, next and last buttons. Its `BUTTON_WIDTH` and `GAP` must match `.app-pagination` in `App.css`.
+- Styling is Bootstrap 5 (npm, CSS only, no Bootstrap JS), then `src/gta-vi-theme.css`, then `src/App.css`, imported in that order by `src/index.jsx`. The theme file is portable: leave it as is and put app styles in `App.css`, using the theme's color variables. It needs `class="app-body"` on `<body>` and the Google Fonts linked in `index.html`.

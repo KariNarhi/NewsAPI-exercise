@@ -9,8 +9,9 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       port: 3000,
-      // Also used by `vite preview`.
-      proxy: {
+      // Also used by `vite preview`. Off in test runs, so that the Vitest UI
+      // server cannot be used to call News API with the key.
+      proxy: mode === "test" ? undefined : {
         "/api/news": {
           target: "https://newsapi.org",
           changeOrigin: true,
@@ -24,6 +25,8 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       environment: "jsdom",
+      mockReset: true,
+      reporters: ["default", "html"],
       setupFiles: "./src/setupTests.js",
     },
   };

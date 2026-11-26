@@ -12,6 +12,7 @@ API_Key.js
 
 # testing
 /coverage
+/.vitest
 
 # production
 /build
