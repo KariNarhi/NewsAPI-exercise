@@ -1,5 +1,4 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 const Sources = ({ sources, loading }) => {
   if (loading) {
@@ -15,8 +14,8 @@ const Sources = ({ sources, loading }) => {
           <p>{source.description}</p>
           <Link
             to={{
-              pathname: `/headlines/?source=${source.id}`,
-              source: { sourceID: source.id }
+              pathname: "/headlines",
+              search: `?source=${source.id}`,
             }}
             className="btn btn-success mr-5"
           >

@@ -6,31 +6,28 @@
 
 ---
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Built with [React](https://react.dev/) and [Vite](https://vite.dev/).
 
-## Available Scripts
+## Setup
 
-In the project directory, you can run:
+Requires Node `^22.22.2`, `^24.15.0` or `>=26`.
 
-### `npm start`
+1. `npm install`
+2. Copy `.env.example` to `.env.local` and set `NEWS_API_KEY` to your key. The file is gitignored. A `NEWS_API_KEY` shell variable overrides it.
+3. `npm start` and open [http://localhost:3000](http://localhost:3000).
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Restart the server after changing the key.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+## Scripts
 
-### `npm test`
+- `npm start` / `npm run dev`: development server
+- `npm test`: Vitest in watch mode
+- `npm run lint`: ESLint
+- `npm run build`: production build into `build/`
+- `npm run preview`: serve the build locally
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## API key and proxy
 
-### `npm run build`
+The browser calls `/api/news/...`. The Vite server forwards the request to `https://newsapi.org/v2/...` and adds the key, so the key is not part of the browser code.
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The proxy exists only in `npm start` and `npm run preview`. A static host serving `build/` has to provide the same `/api/news` forwarding itself.
