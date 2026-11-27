@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -28,7 +29,7 @@ export default defineConfig(({ mode }) => {
       exclude: ["**/node_modules/**", "**/.git/**", "e2e/**"], // Playwright
       mockReset: true,
       reporters: ["default", "html"],
-      setupFiles: "./src/setupTests.js",
+      setupFiles: "./src/setupTests.ts",
     },
   };
 });

@@ -1,4 +1,6 @@
-export const makeSources = (count) =>
+import type { Article, Source } from "./types";
+
+export const makeSources = (count: number): Source[] =>
   Array.from({ length: count }, (_, i) => ({
     id: `source-${i + 1}`,
     name: `Source ${i + 1}`,
@@ -6,7 +8,7 @@ export const makeSources = (count) =>
     url: `https://example.com/${i + 1}`,
   }));
 
-export const makeArticle = (title = "A headline") => ({
+export const makeArticle = (title = "A headline"): Article => ({
   title,
   author: "An Author",
   description: "A summary",

@@ -8,14 +8,14 @@ const ARROWS = ["First page", "Previous page", "Next page", "Last page"];
 afterEach(() => vi.unstubAllGlobals());
 
 // jsdom has no layout, so report a chosen width through a fake ResizeObserver
-const stubWidth = (initial) => {
-  let notify;
-  const report = (width) => notify([{ contentRect: { width } }]);
+const stubWidth = (initial: number) => {
+  let notify: (entries: { contentRect: { width: number } }[]) => void;
+  const report = (width: number) => notify([{ contentRect: { width } }]);
 
   vi.stubGlobal(
     "ResizeObserver",
     class {
-      constructor(callback) {
+      constructor(callback: typeof notify) {
         notify = callback;
       }
       observe() {
@@ -25,7 +25,7 @@ const stubWidth = (initial) => {
     },
   );
 
-  return { resize: (width) => act(() => report(width)) };
+  return { resize: (width: number) => act(() => report(width)) };
 };
 
 const renderPagination = ({
@@ -48,7 +48,8 @@ const numbers = () =>
     .map((button) => Number(button.textContent))
     .filter(Boolean);
 
-const arrow = (name) => screen.getByRole("button", { name });
+const arrow = (name: string) =>
+  screen.getByRole<HTMLButtonElement>("button", { name });
 
 test.each([
   [296, 2], // 320 px screen

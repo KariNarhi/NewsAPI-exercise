@@ -2,31 +2,33 @@ import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
 import { Link, MemoryRouter } from "react-router";
-import { expect, test, vi } from "vitest";
+import { expect, test, vi, type Mock } from "vitest";
 import { makeArticle } from "../testFixtures";
 import Headlines from "./Headlines";
 
 vi.mock("axios");
+const get = axios.get as Mock;
 
-const renderHeadlines = ({ loading = false } = {}) =>
+const renderHeadlines = () =>
   render(
     <MemoryRouter initialEntries={["/headlines?source=first"]}>
       <Link to="/headlines?source=second">Switch source</Link>
-      <Headlines loading={loading} />
+      <Headlines />
     </MemoryRouter>,
   );
 
 const switchSource = () =>
   userEvent.click(screen.getByRole("link", { name: "Switch source" }));
 
-const respondWith = (...titles) => ({
-  data: { articles: titles.map(makeArticle) },
+const respondWith = (...titles: string[]) => ({
+  data: { articles: titles.map((title) => makeArticle(title)) },
 });
 
 // A request that stays pending until the test settles it
 const deferred = () => {
-  let resolve, reject;
-  const promise = new Promise((res, rej) => {
+  let resolve!: (value: unknown) => void;
+  let reject!: (reason: unknown) => void;
+  const promise = new Promise<unknown>((res, rej) => {
     resolve = res;
     reject = rej;
   });
@@ -34,26 +36,35 @@ const deferred = () => {
 };
 
 // Let resolved requests and the renders they cause finish
-const flush = () => act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+const flush = () => act(() => new Promise<void>((resolve) => setTimeout(resolve, 0)));
 
-test("shows the loading text while loading", async () => {
-  axios.get.mockResolvedValue(respondWith("A headline"));
+test.each([
+  ["articles", respondWith("A headline")],
+  ["an empty result", respondWith()],
+])("shows the loading text until %s arrive", async (_, response) => {
+  const request = deferred();
+  get.mockReturnValue(request.promise);
 
-  renderHeadlines({ loading: true });
-  await flush();
-
+  renderHeadlines();
   expect(screen.getByText("Loading...")).toBeInTheDocument();
-  expect(screen.queryByText("A headline")).not.toBeInTheDocument();
+
+  request.resolve(response);
+  await flush();
+  expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
+  expect(screen.queryByText("No headlines") !== null).toBe(
+    response.data.articles.length === 0,
+  );
 });
 
 test("requests and shows the headlines of the source in the URL", async () => {
-  axios.get.mockResolvedValue(respondWith("A headline"));
+  get.mockResolvedValue(respondWith("A headline"));
 
   renderHeadlines();
 
   expect(await screen.findByText("A headline")).toBeInTheDocument();
   expect(axios.get).toHaveBeenCalledExactlyOnceWith("/api/news/top-headlines", {
     params: { sources: "first" },
+    timeout: 10_000,
   });
   expect(screen.getByText("An Author")).toBeInTheDocument();
   expect(screen.getByText("A summary")).toBeInTheDocument();
@@ -66,7 +77,7 @@ test("requests and shows the headlines of the source in the URL", async () => {
 });
 
 test("requests a source with no articles only once", async () => {
-  axios.get.mockResolvedValue(respondWith());
+  get.mockResolvedValue(respondWith());
 
   renderHeadlines();
   await flush();
@@ -83,9 +94,13 @@ test.each([
     { response: { data: { message: "Rate limited." } } },
     "Rate limited.",
   ],
-  ["a network error", new Error("Network Error"), "Network Error"],
+  [
+    "a network error",
+    new Error("Network Error"),
+    "No connection. Check your network and try again.",
+  ],
 ])("shows %s when the request fails", async (_, error, message) => {
-  axios.get.mockRejectedValue(error);
+  get.mockRejectedValue(error);
 
   renderHeadlines();
 
@@ -95,7 +110,7 @@ test.each([
 });
 
 test("requests again when the source changes", async () => {
-  axios.get
+  get
     .mockResolvedValueOnce(respondWith("First news"))
     .mockResolvedValueOnce(respondWith("Second news"));
   renderHeadlines();
@@ -107,11 +122,12 @@ test("requests again when the source changes", async () => {
   expect(screen.queryByText("First news")).not.toBeInTheDocument();
   expect(axios.get).toHaveBeenLastCalledWith("/api/news/top-headlines", {
     params: { sources: "second" },
+    timeout: 10_000,
   });
 });
 
 test("hides the previous articles while the next source loads", async () => {
-  axios.get
+  get
     .mockResolvedValueOnce(respondWith("First news"))
     .mockReturnValueOnce(deferred().promise);
   renderHeadlines();
@@ -120,6 +136,7 @@ test("hides the previous articles while the next source loads", async () => {
   await switchSource();
 
   expect(screen.queryByText("First news")).not.toBeInTheDocument();
+  expect(screen.getByText("Loading...")).toBeInTheDocument();
 });
 
 test("lists articles that share a title without a key warning", async () => {
@@ -128,7 +145,7 @@ test("lists articles that share a title without a key warning", async () => {
     ...makeArticle("Same title"),
     url: `https://example.com/${id}`,
   }));
-  axios.get.mockResolvedValue({ data: { articles } });
+  get.mockResolvedValue({ data: { articles } });
 
   renderHeadlines();
 
@@ -138,11 +155,11 @@ test("lists articles that share a title without a key warning", async () => {
 });
 
 test.each([
-  ["response", (request) => request.resolve(respondWith("Old news"))],
-  ["failure", (request) => request.reject(new Error("Old failure"))],
+  ["response", (request: ReturnType<typeof deferred>) => request.resolve(respondWith("Old news"))],
+  ["failure", (request: ReturnType<typeof deferred>) => request.reject(new Error("Old failure"))],
 ])("ignores a late %s for the previous source", async (_, settle) => {
   const old = deferred();
-  axios.get
+  get
     .mockReturnValueOnce(old.promise)
     .mockResolvedValueOnce(respondWith("Second news"));
   renderHeadlines();
@@ -159,7 +176,7 @@ test.each([
 
 test("does not carry an error over to another source", async () => {
   const next = deferred();
-  axios.get
+  get
     .mockRejectedValueOnce(new Error("Network Error"))
     .mockReturnValueOnce(next.promise);
   renderHeadlines();
@@ -170,4 +187,34 @@ test("does not carry an error over to another source", async () => {
 
   next.resolve(respondWith("Second news"));
   expect(await screen.findByText("Second news")).toBeInTheDocument();
+});
+
+test("retries after a failure", async () => {
+  const second = deferred();
+  get
+    .mockRejectedValueOnce(new Error("Network Error"))
+    .mockReturnValueOnce(second.promise);
+  renderHeadlines();
+
+  await userEvent.click(
+    await screen.findByRole("button", { name: "Try again" }),
+  );
+  expect(screen.getByText("Loading...")).toBeInTheDocument();
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+  second.resolve(respondWith("Recovered"));
+  expect(await screen.findByText("Recovered")).toBeInTheDocument();
+  expect(get).toHaveBeenCalledTimes(2);
+});
+
+test("shows the alert again when the retry fails", async () => {
+  get.mockRejectedValue(new Error("Still down"));
+  renderHeadlines();
+
+  await userEvent.click(
+    await screen.findByRole("button", { name: "Try again" }),
+  );
+
+  expect(await screen.findByRole("alert")).toHaveTextContent("Still down");
+  expect(get).toHaveBeenCalledTimes(2);
 });

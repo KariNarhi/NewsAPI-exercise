@@ -1,6 +1,12 @@
 import { Link } from "react-router";
+import type { Source } from "../types";
 
-const Sources = ({ sources, loading }) => {
+interface SourcesProps {
+  sources: Source[];
+  loading: boolean;
+}
+
+const Sources = ({ sources, loading }: SourcesProps) => {
   if (loading) {
     return <h2 className="app-loading">Loading...</h2>; // Show text "Loading..." if loading not done.
   }

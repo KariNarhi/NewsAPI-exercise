@@ -7,7 +7,7 @@ const ARROW_COUNT = 4;
 
 // Width of the referenced element, or 0 where it cannot be measured
 const useWidth = () => {
-  const ref = useRef(null);
+  const ref = useRef<HTMLElement>(null);
   const [width, setWidth] = useState(0);
 
   useLayoutEffect(() => {
@@ -16,14 +16,26 @@ const useWidth = () => {
     const observer = new ResizeObserver(([entry]) =>
       setWidth(entry.contentRect.width),
     );
-    observer.observe(ref.current);
+    observer.observe(ref.current!); // Set before layout effects run
     return () => observer.disconnect();
   }, []);
 
-  return [ref, width];
+  return [ref, width] as const;
 };
 
-const Pagination = ({ sourcesPerPage, totalSources, currentPage, paginate }) => {
+interface PaginationProps {
+  sourcesPerPage: number;
+  totalSources: number;
+  currentPage: number;
+  paginate: (pageNumber: number) => void;
+}
+
+const Pagination = ({
+  sourcesPerPage,
+  totalSources,
+  currentPage,
+  paginate,
+}: PaginationProps) => {
   const [ref, width] = useWidth();
   const totalPages = Math.ceil(totalSources / sourcesPerPage);
 
@@ -39,7 +51,7 @@ const Pagination = ({ sourcesPerPage, totalSources, currentPage, paginate }) => 
   );
   const pageNumbers = Array.from({ length: visible }, (_, i) => first + i);
 
-  const arrow = (symbol, label, page) => {
+  const arrow = (symbol: string, label: string, page: number) => {
     const disabled = page < 1 || page > totalPages || page === currentPage;
 
     return (

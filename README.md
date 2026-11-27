@@ -6,7 +6,7 @@
 
 ---
 
-Built with [React](https://react.dev/) and [Vite](https://vite.dev/).
+Built with [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/) and [Vite](https://vite.dev/).
 
 ## Setup
 
@@ -26,12 +26,21 @@ Restart the server after changing the key.
 - `npm run test:e2e`: Playwright end-to-end tests
 - `npm run test:e2e:ui`: Playwright UI mode
 - `npm run lint`: ESLint
-- `npm run build`: production build into `build/`
+- `npm run typecheck`: TypeScript check
+- `npm run build`: type check, then production build into `build/`
 - `npm run preview`: serve the build locally
 
 Test runs also write an HTML report to `.vitest/` (gitignored). View it with `npx vite preview --outDir .vitest`.
 
 The end-to-end tests run in Chromium, Firefox and WebKit, including phone emulation, with a mocked API. Install the browsers once with `npx playwright install`. View the last report with `npx playwright show-report`.
+
+## Search
+
+Sources can be searched by name or description; the pagination follows the results.
+
+## Errors and data checks
+
+Failed requests (including a 10 second timeout) show a message with a "Try again" button. Responses are validated; invalid entries are skipped and reported in the browser console.
 
 ## API key and proxy
 

@@ -4,4 +4,4 @@ import "./gta-vi-theme.css";
 import "./App.css"; // App-specific styles, load after the theme
 import App from "./App";
 
-createRoot(document.getElementById("root")).render(<App />);
+createRoot(document.getElementById("root")!).render(<App />);

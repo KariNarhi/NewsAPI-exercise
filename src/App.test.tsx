@@ -1,28 +1,29 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
-import { beforeEach, expect, test, vi } from "vitest";
+import { beforeEach, expect, test, vi, type Mock } from "vitest";
 import App from "./App";
 import { makeArticle, makeSources } from "./testFixtures";
 
 vi.mock("axios");
+const get = axios.get as Mock;
 
 const mockApi = () =>
-  axios.get.mockImplementation(async (url) => ({
+  get.mockImplementation(async (url: string) => ({
     data: url.endsWith("/sources")
       ? { sources: makeSources(13) }
       : { articles: [makeArticle()] },
   }));
 
 const sourceRequests = () =>
-  axios.get.mock.calls.filter(([url]) => url === "/api/news/sources");
+  get.mock.calls.filter(([url]) => url === "/api/news/sources");
 
-const click = (name) => userEvent.click(screen.getByRole("link", { name }));
+const click = (name: string) => userEvent.click(screen.getByRole("link", { name }));
 
-const goToPage = (name) =>
+const goToPage = (name: string) =>
   userEvent.click(screen.getByRole("button", { name }));
 
-const pageButton = (name) => screen.getByRole("button", { name });
+const pageButton = (name: string) => screen.getByRole("button", { name });
 
 beforeEach(() => {
   window.history.pushState({}, "", "/");
@@ -60,6 +61,7 @@ test("opens headlines and returns to the same page of sources", async () => {
   expect(window.location.search).toBe("?source=source-13");
   expect(axios.get).toHaveBeenCalledWith("/api/news/top-headlines", {
     params: { sources: "source-13" },
+    timeout: 10_000,
   });
 
   await click("Back to sources");
@@ -75,11 +77,12 @@ test("loads headlines when their URL is opened directly", async () => {
   expect(await screen.findByText("A headline")).toBeInTheDocument();
   expect(axios.get).toHaveBeenCalledWith("/api/news/top-headlines", {
     params: { sources: "source-3" },
+    timeout: 10_000,
   });
 });
 
 test("shows an error when sources fail to load", async () => {
-  axios.get.mockRejectedValue({
+  get.mockRejectedValue({
     response: { data: { message: "Your API key is invalid." } },
   });
 
@@ -93,7 +96,7 @@ test("shows an error when sources fail to load", async () => {
 });
 
 test("still shows headlines when only the sources request fails", async () => {
-  axios.get.mockImplementation(async (url) => {
+  get.mockImplementation(async (url: string) => {
     if (url.endsWith("/sources")) throw new Error("Network Error");
     return { data: { articles: [makeArticle()] } };
   });
@@ -123,4 +126,90 @@ test("moves between pages with the next and previous buttons", async () => {
 
   await goToPage("Previous page");
   expect(screen.getByText("Source 1")).toBeInTheDocument();
+});
+
+test("loads the sources again with the Try again button", async () => {
+  get.mockRejectedValueOnce(new Error("Network Error"));
+  render(<App />);
+
+  await userEvent.click(
+    await screen.findByRole("button", { name: "Try again" }),
+  );
+
+  expect(await screen.findByText("Source 1")).toBeInTheDocument();
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  expect(sourceRequests()).toHaveLength(2);
+});
+
+const searchbox = () =>
+  screen.getByRole("searchbox", { name: "Search sources" });
+
+test("filters the sources and their pagination from page 1", async () => {
+  render(<App />);
+  await screen.findByText("Source 1");
+  await goToPage("2");
+
+  await userEvent.type(searchbox(), "source 1");
+
+  // Source 1 and 10 to 13 match
+  expect(screen.getByRole("status")).toHaveTextContent("5 of 13 sources");
+  expect(screen.getAllByRole("article")).toHaveLength(5);
+  expect(screen.queryByRole("button", { name: "2" })).not.toBeInTheDocument();
+  expect(pageButton("1")).toHaveAttribute("aria-current", "page");
+
+  await userEvent.click(screen.getByRole("button", { name: "Clear" }));
+  expect(screen.getAllByRole("article")).toHaveLength(12);
+  expect(pageButton("2")).toBeInTheDocument();
+  expect(sourceRequests()).toHaveLength(1);
+});
+
+test("searches descriptions and says when nothing matches", async () => {
+  render(<App />);
+  await screen.findByText("Source 1");
+
+  await userEvent.type(searchbox(), "description 13");
+  expect(screen.getAllByRole("article")).toHaveLength(1);
+
+  await userEvent.type(searchbox(), "zzz");
+  expect(screen.queryByRole("article")).not.toBeInTheDocument();
+  expect(screen.getByRole("status")).toHaveTextContent(
+    "No sources match your search.",
+  );
+});
+
+test("keeps the search after visiting headlines", async () => {
+  render(<App />);
+  await screen.findByText("Source 1");
+  await userEvent.type(searchbox(), "source 13");
+
+  await click("Top headlines");
+  await screen.findByText("A headline");
+  await click("Back to sources");
+
+  expect(searchbox()).toHaveValue("source 13");
+  expect(screen.getAllByRole("article")).toHaveLength(1);
+});
+
+test("has no search field when the sources fail to load", async () => {
+  get.mockRejectedValue(new Error("Network Error"));
+
+  render(<App />);
+  await screen.findByRole("alert");
+
+  expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+});
+
+test("shows loading while the headlines of a chosen source load", async () => {
+  get.mockImplementation((url: string) =>
+    url.endsWith("/sources")
+      ? Promise.resolve({ data: { sources: makeSources(13) } })
+      : new Promise(() => {}),
+  );
+  render(<App />);
+  await screen.findByText("Source 1");
+
+  const [link] = screen.getAllByRole("link", { name: "Top headlines" });
+  await userEvent.click(link);
+
+  expect(screen.getByText("Loading...")).toBeInTheDocument();
 });

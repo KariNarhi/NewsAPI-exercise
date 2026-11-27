@@ -92,6 +92,24 @@
   --bs-btn-active-bg: var(--warm-yellow);
 }
 
+/* Search */
+.app-search {
+  max-width: 36rem;
+}
+
+.app-search .form-control {
+  min-height: 44px;
+}
+
+/* The Clear button replaces the browser's own clear icon */
+.app-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.app-search-summary {
+  font-size: 0.875rem;
+}
+
 /* Pagination */
 .app-pagination {
   flex-wrap: nowrap;
@@ -128,11 +146,16 @@
 }
 
 /* Status messages */
-.app-loading {
+.app-loading,
+.app-empty {
   padding: 3rem 0;
   font-family: var(--font-display);
   letter-spacing: 0.1em;
   text-align: center;
+}
+
+.app-empty {
+  font-size: 2rem; /* Same size as the loading heading */
 }
 
 .app-alert {

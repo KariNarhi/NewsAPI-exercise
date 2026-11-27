@@ -4,7 +4,7 @@ import { expect, test } from "vitest";
 import { makeSources } from "../testFixtures";
 import Sources from "./Sources";
 
-const renderSources = (props) =>
+const renderSources = (props?: { loading: boolean }) =>
   render(
     <MemoryRouter>
       <Sources sources={makeSources(2)} loading={false} {...props} />

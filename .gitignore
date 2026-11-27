@@ -17,6 +17,9 @@ API_Key.js
 /playwright-report
 /blob-report
 
+# TypeScript
+*.tsbuildinfo
+
 # production
 /build
 

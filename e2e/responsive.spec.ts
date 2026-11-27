@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import { cards, expect, makeSources, test } from "./fixtures";
 
 const longUrl = `https://example.com/${"a-very-long-path-".repeat(10)}`;
@@ -9,7 +10,7 @@ test.beforeEach(({ api }) => {
   api.sources[1].description = arabic;
 });
 
-const overflow = (page) =>
+const overflow = (page: Page) =>
   page.evaluate(
     () =>
       document.documentElement.scrollWidth -

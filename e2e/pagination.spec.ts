@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import {
   cards,
   expect,
@@ -12,12 +13,12 @@ test.beforeEach(({ api }) => {
   api.sources = makeSources(600);
 });
 
-const numbers = async (page) => {
+const numbers = async (page: Page) => {
   const texts = await pager(page).getByRole("button").allTextContents();
   return texts.map(Number).filter(Boolean);
 };
 
-const layout = (page) =>
+const layout = (page: Page) =>
   pager(page).evaluate((nav) => {
     const rects = [...nav.querySelectorAll("button")].map((button) =>
       button.getBoundingClientRect(),
@@ -58,7 +59,7 @@ test("moves with the first, previous, next and last buttons", async ({
   const previous = pageButton(page, "Previous page");
   const next = pageButton(page, "Next page");
   const last = pageButton(page, "Last page");
-  const heading = (n) =>
+  const heading = (n: number) =>
     page.getByRole("heading", { name: `Source ${n}`, exact: true });
 
   await expect(first).toBeDisabled();

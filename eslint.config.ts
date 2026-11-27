@@ -3,6 +3,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
+import tseslint from "typescript-eslint";
 
 export default defineConfig([
   globalIgnores([
@@ -14,23 +15,23 @@ export default defineConfig([
     "src/API_Key.js",
   ]),
   {
-    files: ["**/*.{js,jsx}"],
+    files: ["**/*.{ts,tsx}"],
     extends: [
       js.configs.recommended,
+      tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
     languageOptions: {
       globals: globals.browser,
-      parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
   {
-    files: ["vite.config.js", "vite.config.test.js"],
+    files: ["vite.config.ts", "vite.config.test.ts"],
     languageOptions: { globals: globals.node },
   },
   {
-    files: ["playwright.config.js", "e2e/**/*.js"],
+    files: ["playwright.config.ts", "e2e/**/*.ts"],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 ]);

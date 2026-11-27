@@ -1,6 +1,6 @@
 import { cards, expect, gate, pageButton, test } from "./fixtures";
 
-const headlineRequests = (api) =>
+const headlineRequests = (api: { requests: { endpoint: string }[] }) =>
   api.requests.filter((request) => request.endpoint === "top-headlines");
 
 test("opens the headlines of a source from its card", async ({ page, api }) => {
@@ -18,6 +18,19 @@ test("opens the headlines of a source from its card", async ({ page, api }) => {
   expect(headlineRequests(api)).toEqual([
     { endpoint: "top-headlines", source: "source-3" },
   ]);
+});
+
+test("shows loading after navigating from a card", async ({ page, api }) => {
+  const headlines = gate();
+  api.gates["source-1"] = headlines.promise;
+  await page.goto("/");
+
+  await page.getByRole("link", { name: "Top headlines" }).first().click();
+  await expect(page.getByText("Loading...")).toBeVisible();
+
+  headlines.open();
+  await expect(page.getByText("Headline from source-1")).toBeVisible();
+  await expect(page.getByText("Loading...")).toBeHidden();
 });
 
 test("keeps the sources page across headlines and history", async ({
@@ -65,6 +78,7 @@ test("hides the old articles while another source loads", async ({
 
   await expect.poll(() => headlineRequests(api).length).toBe(2);
   await expect(page.getByText("Headline from source-1")).toBeHidden();
+  await expect(page.getByText("Loading...")).toBeVisible();
 
   second.open();
   await expect(page.getByText("Headline from source-2")).toBeVisible();
@@ -77,6 +91,7 @@ test("requests a source with no articles only once", async ({ page, api }) => {
   await page.waitForLoadState("networkidle");
 
   await expect(cards(page)).toHaveCount(0);
+  await expect(page.getByRole("status")).toHaveText("No headlines");
   await expect(page.getByRole("alert")).toBeHidden();
   expect(headlineRequests(api)).toHaveLength(1);
 });
