@@ -1,3 +1,5 @@
+// Entry point of `tsc -b`: type-checks the app and the tooling separately,
+// since they run in different environments
 {
   "files": [],
   "references": [

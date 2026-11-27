@@ -1,6 +1,11 @@
 import type { Source } from "./types";
 
-// Sources whose name or description contains the query, ignoring case
+/**
+ * Finds the sources whose name or description contains the query. Case and
+ * surrounding spaces are ignored.
+ *
+ * @returns The matches in their original order; every source for a blank query.
+ */
 const filterSources = (sources: Source[], query: string): Source[] => {
   const needle = query.trim().toLowerCase();
   if (!needle) return sources;

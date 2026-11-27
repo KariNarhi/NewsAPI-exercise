@@ -1,3 +1,8 @@
+/**
+ * Integration tests: the whole app in jsdom, with only axios mocked. Covers the
+ * path from a request through validation and state to what is shown.
+ */
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
@@ -5,9 +10,11 @@ import { beforeEach, expect, test, vi, type Mock } from "vitest";
 import App from "./App";
 import { makeArticle, makeSources } from "./testFixtures";
 
+// No real requests. `mockReset` in vite.config.ts clears it between tests
 vi.mock("axios");
 const get = axios.get as Mock;
 
+/** Answers like News API: 13 sources (two pages) or one article. */
 const mockApi = () =>
   get.mockImplementation(async (url: string) => ({
     data: url.endsWith("/sources")
@@ -15,19 +22,23 @@ const mockApi = () =>
       : { articles: [makeArticle()] },
   }));
 
+/** Calls made to the sources endpoint. */
 const sourceRequests = () =>
   get.mock.calls.filter(([url]) => url === "/api/news/sources");
 
+/** Clicks a link. */
 const click = (name: string) => userEvent.click(screen.getByRole("link", { name }));
 
+/** Clicks a pagination button. */
 const goToPage = (name: string) =>
   userEvent.click(screen.getByRole("button", { name }));
 
 const pageButton = (name: string) => screen.getByRole("button", { name });
 
 beforeEach(() => {
+  // The URL outlives a test, so start each one from the front page
   window.history.pushState({}, "", "/");
-  // jsdom does not implement scrolling
+  // jsdom does not implement scrolling; the spy also lets tests check calls
   vi.spyOn(window, "scrollTo").mockImplementation(() => {});
   mockApi();
 });

@@ -1,13 +1,20 @@
+/** Tests of how many page buttons show, which ones, and what they do. */
+
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 import Pagination from "./Pagination";
 
+/** Accessible names of the arrow buttons. */
 const ARROWS = ["First page", "Previous page", "Next page", "Last page"];
 
 afterEach(() => vi.unstubAllGlobals());
 
-// jsdom has no layout, so report a chosen width through a fake ResizeObserver
+/**
+ * jsdom has no layout, so this fakes ResizeObserver to report a chosen width.
+ *
+ * @returns `resize` to report a new width later.
+ */
 const stubWidth = (initial: number) => {
   let notify: (entries: { contentRect: { width: number } }[]) => void;
   const report = (width: number) => notify([{ contentRect: { width } }]);
@@ -28,6 +35,7 @@ const stubWidth = (initial: number) => {
   return { resize: (width: number) => act(() => report(width)) };
 };
 
+/** Renders Pagination with 12 items per page. */
 const renderPagination = ({
   pages = 20,
   currentPage = 1,
@@ -42,16 +50,19 @@ const renderPagination = ({
     />,
   );
 
+/** The page numbers currently shown; arrow symbols are filtered out. */
 const numbers = () =>
   screen
     .queryAllByRole("button")
     .map((button) => Number(button.textContent))
     .filter(Boolean);
 
+/** An arrow button by its accessible name. */
 const arrow = (name: string) =>
   screen.getByRole<HTMLButtonElement>("button", { name });
 
 test.each([
+  // [width of the nav, how many page numbers fit]
   [296, 2], // 320 px screen
   [366, 3], // 390 px screen
   [696, 10],

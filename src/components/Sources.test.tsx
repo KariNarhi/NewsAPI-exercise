@@ -1,9 +1,12 @@
+/** Tests of the source cards and their links. */
+
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { expect, test } from "vitest";
 import { makeSources } from "../testFixtures";
 import Sources from "./Sources";
 
+/** Renders two sources inside a router, which Link requires. */
 const renderSources = (props?: { loading: boolean }) =>
   render(
     <MemoryRouter>

@@ -1,3 +1,5 @@
+/** Tests of the message chosen for each kind of failure. */
+
 import { expect, test } from "vitest";
 import getErrorMessage from "./getErrorMessage";
 

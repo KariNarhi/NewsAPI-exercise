@@ -1,8 +1,11 @@
+/** Tests of the search field on its own; filtering is tested elsewhere. */
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test, vi } from "vitest";
 import SearchFilter from "./SearchFilter";
 
+/** Renders the field and returns its onChange spy. */
 const renderSearch = (query = "", matches = 5, total = 5) => {
   const onChange = vi.fn();
   render(
@@ -16,6 +19,7 @@ const renderSearch = (query = "", matches = 5, total = 5) => {
   return onChange;
 };
 
+/** The search field. */
 const input = () =>
   screen.getByRole("searchbox", { name: "Search sources" });
 

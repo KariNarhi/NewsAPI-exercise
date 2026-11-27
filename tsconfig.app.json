@@ -1,3 +1,4 @@
+// The browser app in src/, including its Vitest tests
 {
   "compilerOptions": {
     "target": "es2022",
@@ -7,7 +8,9 @@
     "types": ["vite/client"],
     "jsx": "react-jsx",
     "strict": true,
+    // Type checking only: Vite does the compiling
     "noEmit": true,
+    // Vite compiles file by file, so each file must stand alone
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "noUnusedLocals": true,

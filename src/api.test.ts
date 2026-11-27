@@ -1,3 +1,5 @@
+/** Tests of response validation and of the options sent with requests. */
+
 import axios from "axios";
 import { afterEach, beforeEach, expect, test, vi, type Mock } from "vitest";
 import { fetchArticles, fetchSources, TIMEOUT_MS, UNEXPECTED_DATA } from "./api";
@@ -6,10 +8,12 @@ import { makeArticle, makeSources } from "./testFixtures";
 vi.mock("axios");
 const get = axios.get as Mock;
 
+/** Makes the next requests resolve with this body. */
 const respond = (data: unknown) => get.mockResolvedValue({ data });
 const [source] = makeSources(1);
 
 beforeEach(() => {
+  // Keep the output quiet, and let tests check the warning
   vi.spyOn(console, "warn").mockImplementation(() => {});
 });
 afterEach(() => vi.restoreAllMocks());

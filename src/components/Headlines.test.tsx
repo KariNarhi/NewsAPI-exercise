@@ -1,3 +1,5 @@
+/** Tests of the states of Headlines: loading, list, empty, error and retry. */
+
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
@@ -9,6 +11,10 @@ import Headlines from "./Headlines";
 vi.mock("axios");
 const get = axios.get as Mock;
 
+/**
+ * Renders the headlines of source "first", with a link that switches to source
+ * "second" without remounting the component.
+ */
 const renderHeadlines = () =>
   render(
     <MemoryRouter initialEntries={["/headlines?source=first"]}>
@@ -20,11 +26,12 @@ const renderHeadlines = () =>
 const switchSource = () =>
   userEvent.click(screen.getByRole("link", { name: "Switch source" }));
 
+/** A response body holding one article per title. */
 const respondWith = (...titles: string[]) => ({
   data: { articles: titles.map((title) => makeArticle(title)) },
 });
 
-// A request that stays pending until the test settles it
+/** A request that stays pending until the test settles it. */
 const deferred = () => {
   let resolve!: (value: unknown) => void;
   let reject!: (reason: unknown) => void;
@@ -35,7 +42,7 @@ const deferred = () => {
   return { promise, resolve, reject };
 };
 
-// Let resolved requests and the renders they cause finish
+/** Lets resolved requests and the renders they cause finish. */
 const flush = () => act(() => new Promise<void>((resolve) => setTimeout(resolve, 0)));
 
 test.each([
@@ -76,6 +83,7 @@ test("requests and shows the headlines of the source in the URL", async () => {
   expect(readMore).toHaveAttribute("rel", "noopener noreferrer");
 });
 
+// Guards against the old endless refetch of an empty result
 test("requests a source with no articles only once", async () => {
   get.mockResolvedValue(respondWith());
 
@@ -139,6 +147,7 @@ test("hides the previous articles while the next source loads", async () => {
   expect(screen.getByText("Loading...")).toBeInTheDocument();
 });
 
+// React reports duplicate keys through console.error
 test("lists articles that share a title without a key warning", async () => {
   const consoleError = vi.spyOn(console, "error");
   const articles = ["one", "two"].map((id) => ({
@@ -158,6 +167,7 @@ test.each([
   ["response", (request: ReturnType<typeof deferred>) => request.resolve(respondWith("Old news"))],
   ["failure", (request: ReturnType<typeof deferred>) => request.reject(new Error("Old failure"))],
 ])("ignores a late %s for the previous source", async (_, settle) => {
+  // The first source answers only after the second one is already shown
   const old = deferred();
   get
     .mockReturnValueOnce(old.promise)

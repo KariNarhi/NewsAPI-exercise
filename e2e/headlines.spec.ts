@@ -1,5 +1,8 @@
+/** Navigating to headlines and back, their states, and browser history. */
+
 import { cards, expect, gate, pageButton, test } from "./fixtures";
 
+/** Requests made for headlines. */
 const headlineRequests = (api: { requests: { endpoint: string }[] }) =>
   api.requests.filter((request) => request.endpoint === "top-headlines");
 

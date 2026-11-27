@@ -1,3 +1,5 @@
+/** Searching the sources and how the pagination follows. */
+
 import type { Page } from "@playwright/test";
 import {
   cards,
@@ -8,12 +10,14 @@ import {
   test,
 } from "./fixtures";
 
+// Two sources get a unique name or description to search for
 test.beforeEach(({ api }) => {
   api.sources = makeSources(130);
   api.sources[99].name = "The Lighthouse";
   api.sources[100].description = "Maritime reporting from the coast";
 });
 
+/** The search field. */
 const searchbox = (page: Page) =>
   page.getByRole("searchbox", { name: "Search sources" });
 

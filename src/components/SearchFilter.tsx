@@ -1,12 +1,16 @@
 import { useRef } from "react";
 
+/** Props of SearchFilter. */
 interface SearchFilterProps {
   query: string;
   onChange: (query: string) => void;
+  // Number of sources that match the query
   matches: number;
+  // Number of sources in all
   total: number;
 }
 
+/** The line under the field that describes the result of the search. */
 const summary = (query: string, matches: number, total: number) => {
   const noun = total === 1 ? "source" : "sources";
   if (!query.trim()) return `${total} ${noun}`;
@@ -14,6 +18,11 @@ const summary = (query: string, matches: number, total: number) => {
   return `${matches} of ${total} ${noun}`;
 };
 
+/**
+ * Search field for the sources, with a Clear button and a result count.
+ *
+ * A controlled component: App holds the query and does the filtering.
+ */
 const SearchFilter = ({
   query,
   onChange,
@@ -22,6 +31,7 @@ const SearchFilter = ({
 }: SearchFilterProps) => {
   const input = useRef<HTMLInputElement>(null);
 
+  /** Empties the search and puts the cursor back, as the button disappears. */
   const clear = () => {
     onChange("");
     input.current?.focus();
@@ -46,6 +56,7 @@ const SearchFilter = ({
           </button>
         )}
       </div>
+      {/* role="status" makes screen readers announce the new count */}
       <p className="app-search-summary mt-2 mb-0" role="status">
         {summary(query, matches, total)}
       </p>

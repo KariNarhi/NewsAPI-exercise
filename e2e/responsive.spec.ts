@@ -1,15 +1,20 @@
+/** Small screens, touch targets, text direction and the theme. */
+
 import type { Page } from "@playwright/test";
 import { cards, expect, makeSources, test } from "./fixtures";
 
+// Awkward content for the layout
 const longUrl = `https://example.com/${"a-very-long-path-".repeat(10)}`;
 const arabic = "موقع متخصص في متابعة سوق الأسهم السعودي";
 
+// The first two cards carry the awkward content
 test.beforeEach(({ api }) => {
   api.sources = makeSources(30);
   api.sources[0].url = longUrl;
   api.sources[1].description = arabic;
 });
 
+/** How many px the page is wider than the window. */
 const overflow = (page: Page) =>
   page.evaluate(
     () =>

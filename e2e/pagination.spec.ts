@@ -1,3 +1,5 @@
+/** Layout and behaviour of the pagination row in real browsers. */
+
 import type { Page } from "@playwright/test";
 import {
   cards,
@@ -13,11 +15,16 @@ test.beforeEach(({ api }) => {
   api.sources = makeSources(600);
 });
 
+/** The page numbers currently shown. */
 const numbers = async (page: Page) => {
   const texts = await pager(page).getByRole("button").allTextContents();
   return texts.map(Number).filter(Boolean);
 };
 
+/**
+ * Measures the buttons: number of rows, whether all are on screen, and the
+ * shortest side of the smallest one.
+ */
 const layout = (page: Page) =>
   pager(page).evaluate((nav) => {
     const rects = [...nav.querySelectorAll("button")].map((button) =>
@@ -33,6 +40,7 @@ const layout = (page: Page) =>
   });
 
 for (const { width, count } of [
+  // Expected numbers follow from 44 px buttons and 6 px gaps
   { width: 320, count: 2 },
   { width: 390, count: 3 },
   { width: 768, count: 10 },
@@ -107,6 +115,7 @@ test("scrolls to the top when the page changes", async ({ page }) => {
   await page.goto("/");
   await expect(cards(page)).toHaveCount(12);
 
+  // Scroll down to the pager first, so that there is something to undo
   const next = pageButton(page, "Next page");
   await next.scrollIntoViewIfNeeded();
   expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);

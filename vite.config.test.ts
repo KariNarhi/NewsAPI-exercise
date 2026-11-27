@@ -1,19 +1,23 @@
 // @vitest-environment node
+// Plain Node: this file tests configuration, not the UI
 import { loadEnv, type ProxyOptions, type UserConfig } from "vite";
 import { expect, test, vi } from "vitest";
 import config from "./vite.config";
 
-// Mocked so that these tests never read .env.local and the real API key
+// Mocked so that these tests never read .env.local and the real API key, which
+// a failing assertion could otherwise print
 vi.mock("vite", () => ({
   defineConfig: (value: unknown) => value,
   loadEnv: vi.fn(),
 }));
 
+/** Builds the config as Vite would, with a made-up environment. */
 const loadConfig = (env: Record<string, string>, mode = "development") => {
   vi.mocked(loadEnv).mockReturnValue(env);
   return config({ mode, command: "serve" }) as UserConfig;
 };
 
+/** The proxy rule for News API. */
 const newsProxy = (loaded: UserConfig) =>
   loaded.server?.proxy?.["/api/news"] as ProxyOptions;
 

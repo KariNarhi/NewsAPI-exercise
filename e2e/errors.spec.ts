@@ -1,5 +1,8 @@
+/** Failed requests and unusable data, as the user sees them. */
+
 import { cards, expect, makeArticles, makeSources, test } from "./fixtures";
 
+/** Each kind of failure with the message it should produce. */
 const failures: {
   name: string;
   failure: { status: number; message: string } | "network";
@@ -54,6 +57,7 @@ for (const { name, failure, text } of failures) {
   });
 }
 
+// Responses with status 200 that are not News API data
 for (const { name, contentType, body } of [
   { name: "an HTML page", contentType: "text/html", body: "<!DOCTYPE html>" },
   { name: "the wrong shape", contentType: "application/json", body: "{}" },
@@ -91,6 +95,7 @@ test("skips invalid articles and shows the rest", async ({ page, api }) => {
   await expect(cards(page)).toHaveCount(1);
 });
 
+// Waits for the real timeout, so this test is slow by design
 test("gives up on a request after ten seconds", async ({ page, api }) => {
   api.hanging.add("sources");
 
@@ -103,6 +108,7 @@ test("gives up on a request after ten seconds", async ({ page, api }) => {
   );
 });
 
+// Retry: fail first, then let the same request succeed
 for (const { path, endpoint, count } of [
   { path: "/", endpoint: "sources", count: 12 },
   {

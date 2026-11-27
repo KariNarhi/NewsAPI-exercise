@@ -1,3 +1,5 @@
+/** The sources page: loading, grid, links and keyboard use. */
+
 import { cards, expect, gate, test } from "./fixtures";
 
 test("shows the loading text, then twelve sources", async ({ page, api }) => {
@@ -13,6 +15,7 @@ test("shows the loading text, then twelve sources", async ({ page, api }) => {
   expect(api.requests).toEqual([{ endpoint: "sources", source: null }]);
 });
 
+// A full page of 12 should leave no partly filled row
 for (const { width, columns } of [
   { width: 390, columns: 1 },
   { width: 768, columns: 2 },
@@ -23,6 +26,7 @@ for (const { width, columns } of [
     await page.goto("/");
     await expect(cards(page)).toHaveCount(12);
 
+    // Cards with the same top edge are on the same row
     const tops = await cards(page).evaluateAll((items) =>
       items.map((item) => Math.round(item.getBoundingClientRect().top)),
     );

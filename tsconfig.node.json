@@ -1,6 +1,8 @@
+// Config files and Playwright tests, which run in Node
 {
   "compilerOptions": {
     "target": "es2023",
+    // "dom" is for the functions passed to page.evaluate()
     "lib": ["es2023", "dom", "dom.iterable"],
     "module": "esnext",
     "moduleResolution": "bundler",
